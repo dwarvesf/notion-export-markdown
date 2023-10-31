@@ -1,0 +1,9 @@
+Markdown
+notion_client
+pyopenssl
+ndg-httpsclient
+pyasn1
+urllib3
+aiohttp
+asyncio
+python-dotenv
