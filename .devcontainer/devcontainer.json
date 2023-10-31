@@ -47,6 +47,9 @@
 
 	// Use 'postCreateCommand' to run commands after the container is created.
 	"postCreateCommand": "pip3 install --user -r requirements.txt",
+	"postStartCommand": {
+    "safeDir": "git config --global --add safe.directory ${containerWorkspaceFolder}"
+  },
 
 	// Comment out to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
 	"remoteUser": "vscode"
