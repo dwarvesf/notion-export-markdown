@@ -5,6 +5,7 @@ from pathlib import Path
 from urllib.parse import urljoin
 from urllib.parse import urlparse
 from urllib.parse import unquote
+from . import utils
 
 
 def paragraph(information: dict) -> str:
@@ -212,12 +213,14 @@ def block_convertor(block: object, depth=0, page_id='') -> str:
     block_type = block.get("type")
 
     if block_type in block_type_map:
-        outcome_block = block_type_map[block_type](information_collector(block[block_type], page_id)) + "\n\n"
+        outcome_block = block_type_map[block_type](
+            information_collector(block[block_type], page_id)) + "\n\n"
     else:
-        outcome_block = f"<!-- {block_type} -->\n\n"
+        outcome_block = f"<!-- {block_type} {block['id']} -->\n\n"
 
     if block_type == "code":
-        outcome_block = outcome_block.rstrip('\n').replace('\n', '\n'+'\t'*depth)
+        outcome_block = outcome_block.rstrip(
+            '\n').replace('\n', '\n'+'\t'*depth)
         outcome_block += '\n\n'
 
     if all(k in block for k in ("has_children", "children")):
@@ -228,7 +231,7 @@ def block_convertor(block: object, depth=0, page_id='') -> str:
             for cell_block in child_blocks:
                 cell_block_type = cell_block['type']
                 table_list.append(block_type_map[cell_block_type](
-                    information_collector(cell_block[cell_block_type],page_id))
+                    information_collector(cell_block[cell_block_type], page_id))
                 )
             # convert to markdown table
             for index, value in enumerate(table_list):
@@ -252,7 +255,7 @@ def block_convertor(block: object, depth=0, page_id='') -> str:
                 if block['type'] == "heading_1":
                     depth = 0
                 block_md = block_convertor(block, depth, page_id)
-                outcome_block += "\t"*depth + block_md
+                outcome_block += block_md
 
     return outcome_block
 
@@ -425,8 +428,14 @@ def grouping(page_md: str) -> str:
         prev_line_type = line_type
     return "\n".join(page_md_fixed)
 
-def parse_markdown(page_id: str, block: object):
+
+def parse_markdown(page_id: str, block: dict, frontmatter: dict):
+    metadata = '---\n'
+    for key, value in frontmatter.items():
+        metadata += f"{utils.snake_case(key)}: {value}\n"
+    metadata += f"---\n\n"
+
     page_md = blocks_convertor(block, page_id)
     page_md = grouping(page_md)
     page_md = page_md.replace("\n\n\n", "\n\n")
-    return page_md
+    return metadata + page_md

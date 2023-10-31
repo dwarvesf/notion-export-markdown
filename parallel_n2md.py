@@ -8,8 +8,9 @@ import logging
 from notion_client import AsyncClient
 from dotenv import load_dotenv
 
+from parser.frontmatter_parser import parse_frontmatter
 from parser.markdown_parser import parse_markdown
-from parser.notion_parser import block_parser
+from parser.notion_parser import parse_blocks
 from parser.utils import slugify
 
 load_dotenv()
@@ -26,14 +27,15 @@ async def download_page(page_id, path):
         page = await notion.pages.retrieve(page_id)
         blocks = await notion.blocks.children.list(page_id)
 
+        page = parse_frontmatter(page)
         results = []
         for block in blocks["results"]:
-            block = await block_parser(block, notion)
+            block = await parse_blocks(block, notion)
             results.append(block)
         blocks["results"] = results
 
         title = slugify(page["properties"]["Name"]["title"][0]["plain_text"])
-        page_md = parse_markdown(page_id, blocks)
+        page_md = parse_markdown(page_id, blocks, page["frontmatter"])
         page_json = json.dumps(page, indent=2)
         block_json = json.dumps(blocks, indent=2)
 

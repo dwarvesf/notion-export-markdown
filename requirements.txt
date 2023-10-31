@@ -7,3 +7,4 @@ urllib3
 aiohttp
 asyncio
 python-dotenv
+python-dateutil

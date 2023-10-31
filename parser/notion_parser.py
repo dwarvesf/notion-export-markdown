@@ -2,7 +2,7 @@ from notion_client import AsyncClient
 import json
 
 
-async def block_parser(block: dict, notion: "AsyncClient")-> dict:
+async def parse_blocks(block: dict, notion: "AsyncClient")-> dict:
     if block["has_children"]:
         block["children"] = []
         start_cursor = None
@@ -15,5 +15,5 @@ async def block_parser(block: dict, notion: "AsyncClient")-> dict:
                 break
 
         for child_block in block["children"]:
-            await block_parser(child_block, notion)
+            await parse_blocks(child_block, notion)
     return block
