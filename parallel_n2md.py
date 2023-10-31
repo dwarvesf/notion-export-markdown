@@ -3,39 +3,77 @@ import os
 import sys
 import getopt
 import json
+import logging
 
 from notion_client import AsyncClient
 from dotenv import load_dotenv
 
+from parser.markdown_parser import parse_markdown
+from parser.notion_parser import block_parser
+from parser.utils import slugify
+
 load_dotenv()
 
-notion = AsyncClient(auth=os.environ["NOTION_TOKEN"])
+semaphore = asyncio.Semaphore(3)
+notion = AsyncClient(
+    auth=os.environ["NOTION_TOKEN"],
+    log_level=logging.INFO,
+)
+
 
 async def download_page(page_id, path):
-    page = await notion.pages.retrieve(page_id)
-    blocks = await notion.blocks.children.list(page_id)
-    title = page["properties"]["Name"]["title"][0]["plain_text"]
+    async with semaphore:
+        page = await notion.pages.retrieve(page_id)
+        blocks = await notion.blocks.children.list(page_id)
 
-    # for result in blocks["results"]:
-    #     if result["has_children"]:
-    #         result_json = json.dumps(result, indent=2)
-    #         print(result_json)
+        results = []
+        for block in blocks["results"]:
+            block = await block_parser(block, notion)
+            results.append(block)
+        blocks["results"] = results
 
-    page_json = json.dumps(page, indent=2)
-    blocks_json = json.dumps(blocks, indent=2)
+        title = slugify(page["properties"]["Name"]["title"][0]["plain_text"])
+        page_md = parse_markdown(page_id, blocks)
+        page_json = json.dumps(page, indent=2)
+        block_json = json.dumps(blocks, indent=2)
 
-    if not os.path.exists(f"build/{path}/{title}"):
-        os.makedirs(f"build/{path}/{title}")
-    with open(f"build/{path}/{title}/page.json", "w") as f:
-        f.write(page_json)
-    with open(f"build/{path}/{title}/blocks.json", "w") as f:
-        f.write(blocks_json)
+        if not os.path.exists(f"build/{path}/{page_id}"):
+            os.makedirs(f"build/{path}/{page_id}")
+        if not os.path.exists(f"build/{path}/_markdown"):
+            os.makedirs(f"build/{path}/_markdown")
 
-async def download_database(path, database_id):
-    pages = await notion.databases.query(database_id=database_id)
+        with open(f"build/{path}/{page_id}/page.json", "w") as f:
+            f.write(page_json)
+        with open(f"build/{path}/{page_id}/block.json", "w") as f:
+            f.write(block_json)
+        with open(f"build/{path}/{page_id}/{title}.md", "w") as f:
+            f.write(page_md)
+        with open(f"build/{path}/_markdown/{title}.md", "w") as f:
+            f.write(page_md)
+
+
+async def parallel_download_pages(path, pages):
     page_ids = [page["id"] for page in pages["results"]]
     tasks = [download_page(page_id, path) for page_id in page_ids]
     await asyncio.gather(*tasks)
+
+
+async def download_database(path, database_id):
+    pages = None
+    start_cursor = None
+    # pages = await notion.databases.query(database_id=database_id)
+
+    while True:
+        if start_cursor is None:
+            pages = await notion.databases.query(database_id=database_id)
+            await parallel_download_pages(path, pages)
+        else:
+            pages = await notion.databases.query(database_id=database_id, start_cursor=start_cursor)
+            await parallel_download_pages(path, pages)
+        if pages:
+            start_cursor = pages['next_cursor']
+            if start_cursor is None:
+                break
 
 
 argv = sys.argv[1:]
@@ -51,4 +89,4 @@ try:
     asyncio.run(download_database(path, database_id))
 
 except getopt.error as err:
-    print (str(err))
+    print(str(err))
