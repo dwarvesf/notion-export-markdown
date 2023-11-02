@@ -63,7 +63,6 @@ async def parallel_download_pages(path, pages):
 async def download_database(path, database_id):
     pages = None
     start_cursor = None
-    # pages = await notion.databases.query(database_id=database_id)
 
     while True:
         if start_cursor is None:
