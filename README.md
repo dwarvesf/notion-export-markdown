@@ -28,7 +28,7 @@ Export the `NOTION_TOKEN` environment variable in your current shell, or create 
 NOTION_TOKEN=...
 ```
 
-Then we run the command on `parallel_n2md.py` and specify our output path (`-p`) and database ID (`-d`).
+Then we run the command on `parallel_n2md.py` and specify our output path (`-p`) and database ID (`-d`). The files will be built in the `build` folder.
 
 For instance, we will output the markdown files in the `./build/memo/_markdown` folder with our [memo](https://memo.d.foundation/1f6986deb0db47769ddd7e9012699740) Notion page database ID being `1f6986deb0db47769ddd7e9012699740`
 
