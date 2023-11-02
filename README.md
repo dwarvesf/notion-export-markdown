@@ -5,7 +5,9 @@ This is our internal tool to convert Notion pages to markdown. It is loosely bas
 
 ### Differences from notion4ever
 
-[notion4ever](https://github.com/MerkulovDaniil/notion4ever) mutates a `notion_content.json` file, before structuring it with `notion_structured.json`. This is so it can process blocks and pages + images in one go. However, this means it can only download blocks, pages, and databases one at a time as it must update those files synchronously. This is considerably slow for large Notion databases like our [memo](https://memo.d.foundation/1f6986deb0db47769ddd7e9012699740). On top of that, Notion images expire after 1 hour as they are accessed through presigned URLs from Amazon's S3 storage, meaning even if we finished downloading Notion metadata, it would be mostly unusable without those images.
+[notion4ever](https://github.com/MerkulovDaniil/notion4ever) mutates the `notion_content.json` file before structuring it with `notion_structured.json`. This allows it to process blocks, pages, and images simultaneously. However, this also means that it can only download blocks, pages, and databases one at a time, as it needs to update those files synchronously. This process can be quite slow for large Notion databases, such as our [memo](https://memo.d.foundation/1f6986deb0db47769ddd7e9012699740).
+
+Additionally, Notion images have a one-hour expiration time as they are accessed through presigned URLs from Amazon's S3 storage. This means that even if we successfully download Notion metadata, it would be mostly unusable without those accompanying images.
 
 Our implementation simplifies a few things:
 - Everything is processed in memory and we just dump `page.json` and `blocks.json` files for reference.
