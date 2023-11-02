@@ -1,5 +1,4 @@
 from notion_client import AsyncClient
-import json
 
 
 async def parse_blocks(block: dict, notion: "AsyncClient")-> dict:
