@@ -18,7 +18,11 @@ Our implementation simplifies a few things:
 
 ## Getting started
 
-This repository uses devcontainers to setup the environment for Python. We recommend using Python 3.10 as versions after this do not support `asyncio` and `aiohttp` since there are no build support for `wheels`. Refer to [VSCode's developing inside a devcontainer](https://code.visualstudio.com/docs/devcontainers/containers) to get started with devcontainers, or you can open it with [DevPod](https://devpod.sh/):
+[![Built with Devbox](https://jetpack.io/img/devbox/shield_galaxy.svg)](https://jetpack.io/devbox/docs/contributor-quickstart/)
+
+This repository uses [devbox](https://www.jetpack.io/devbox/docs/) and [devcontainers](https://code.visualstudio.com/docs/devcontainers/containers) to manage dependencies and setup a common development environment. To get started with devbox, once installed, just run `devbox shell` and you should be up and running.
+
+We recommend using Python 3.10 as versions after this do not support `asyncio` and `aiohttp` since there are no build support for `wheels`. Refer to [VSCode's developing inside a devcontainer](https://code.visualstudio.com/docs/devcontainers/containers) to get started with devcontainers, or you can also open it with [DevPod](https://devpod.sh/):
 
 [![Open in DevPod!](https://devpod.sh/assets/open-in-devpod.svg)](https://devpod.sh/open#https://github.com/dwarvesf/notion-export-markdown)
 

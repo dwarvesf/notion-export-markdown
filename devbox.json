@@ -1,0 +1,23 @@
+{
+  "packages": {
+    "python310Packages.pip": "latest",
+    "python310": "latest",
+    "glibcLocales": {
+      "version": "latest",
+      "excluded_platforms": [
+        "aarch64-darwin"
+      ]
+    }
+  },
+  "shell": {
+    "init_hook": [
+      ". $VENV_DIR/bin/activate",
+      "pip install -r requirements.txt"
+    ],
+    "scripts": {
+      "export-memo": "python parallel_n2md.py -p memo -d 1f6986deb0db47769ddd7e9012699740",
+      "export-radar": "python parallel_n2md.py -p radar -d 5c97adf1cae543bf97f4e1a3804799b9",
+      "export-radar-timeline": "python parallel_n2md.py -p radar-timeline -d 5870379592444a1b9d220f391eefa80d"
+    }
+  }
+}
