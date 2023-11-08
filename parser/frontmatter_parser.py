@@ -313,7 +313,7 @@ def parse_frontmatter(page: dict):
         "people": p_people,
         "files": p_files,
         "checkbox": p_checkbox,
-        "url": p_url,
+        # "url": p_url,
         "email": p_email,
         "phone_number": p_phone_number,
         # "formula": p_formula,
