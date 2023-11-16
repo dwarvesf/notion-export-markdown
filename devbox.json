@@ -1,7 +1,7 @@
 {
   "packages": {
     "python310Packages.pip": "latest",
-    "python310": "latest",
+    "python": "3.10.13",
     "glibcLocales": {
       "version": "latest",
       "excluded_platforms": [
